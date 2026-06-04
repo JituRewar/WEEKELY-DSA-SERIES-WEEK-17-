@@ -1,0 +1,137 @@
+# Day 1 - Min Cost to Connect All Points (LeetCode 1584)
+
+## Problem Link
+https://leetcode.com/problems/min-cost-to-connect-all-points/
+
+## Difficulty
+Medium
+
+## Topic
+- Graphs
+- Minimum Spanning Tree (MST)
+- Prim's Algorithm
+- Priority Queue (Min Heap)
+
+---
+
+## Problem Statement
+
+You are given an array `points` representing integer coordinates of some points on a 2D plane.
+
+The cost of connecting two points is the Manhattan distance between them:
+
+Distance = |x₁ - x₂| + |y₁ - y₂|
+
+Return the minimum cost required to connect all points such that there is exactly one simple path between any two points.
+
+---
+
+## Approach
+
+This problem can be modeled as a complete weighted graph:
+
+- Every point acts as a node.
+- Edge weight between two nodes = Manhattan Distance.
+- We need the minimum cost to connect all nodes.
+
+This is a classic **Minimum Spanning Tree (MST)** problem.
+
+### Prim's Algorithm
+
+1. Start from any node (node 0).
+2. Push `{0,0}` into the min heap.
+3. Always pick the minimum weight edge.
+4. If the node is already included in MST, skip it.
+5. Otherwise:
+   - Add its weight to MST cost.
+   - Mark it visited.
+   - Push all possible edges from this node to unvisited nodes.
+6. Continue until all nodes are included.
+
+---
+
+## Dry Run
+
+Input:
+
+```cpp
+points = [[0,0],[2,2],[3,10],[5,2],[7,0]]
+
+Selected edges by Prim's:
+
+(0,1) = 4
+(1,3) = 3
+(3,4) = 4
+(1,2) = 9
+
+Total MST Cost:
+
+4 + 3 + 4 + 9 = 20
+
+Output:
+
+20
+Time Complexity
+
+For every selected node, we may examine all other nodes.
+
+O(N² log N)
+
+where N = number of points.
+
+Space Complexity
+O(N²)
+
+Priority Queue may contain many candidate edges.
+
+Key Learning
+MST can be applied even when edges are not explicitly given.
+Manhattan Distance can act as edge weights.
+Prim's Algorithm is useful for dense graphs.
+Min Heap helps in selecting the minimum weight edge efficiently.
+Solution (Prim's Algorithm)
+class Solution {
+public:
+    int manhattanDist(vector<vector<int>>& points,int p1,int p2){
+        return abs(points[p1][0]-points[p2][0]) +
+               abs(points[p1][1]-points[p2][1]);
+    }
+
+    int minCostConnectPoints(vector<vector<int>>& points) {
+        int n = points.size();
+
+        priority_queue<
+            pair<int,int>,
+            vector<pair<int,int>>,
+            greater<pair<int,int>>
+        > pq;
+
+        vector<bool> mstSet(n,false);
+
+        int mst = 0;
+
+        pq.push({0,0});
+
+        while(!pq.empty()){
+            auto p = pq.top();
+            pq.pop();
+
+            int wt = p.first;
+            int node = p.second;
+
+            if(mstSet[node]) continue;
+
+            mstSet[node] = true;
+            mst += wt;
+
+            for(int i=0;i<n;i++){
+                if(!mstSet[i]){
+                    int edgeWt = manhattanDist(points,node,i);
+                    pq.push({edgeWt,i});
+                }
+            }
+        }
+
+        return mst;
+    }
+};
