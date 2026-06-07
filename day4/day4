@@ -1,0 +1,339 @@
+# Day 4 - Articulation Points (Tarjan's Algorithm)
+
+## Topic
+
+- Graphs
+- DFS
+- Tarjan's Algorithm
+- Articulation Points
+- Low Link Values
+
+---
+
+## Problem Statement
+
+Given an undirected graph, find all **Articulation Points (Cut Vertices)**.
+
+An articulation point is a vertex whose removal increases the number of connected components in the graph.
+
+In simple words:
+
+- Removing this vertex disconnects part of the graph.
+- It acts as a critical connection point in the network.
+
+---
+
+## Example
+
+Graph:
+
+```text
+    0
+    |
+    1
+   / \
+  2   4
+     / \
+    3   5
+```
+
+Articulation Points:
+
+```text
+1 4
+```
+
+Removing:
+
+- Vertex 1 disconnects node 0 and node 2.
+- Vertex 4 disconnects nodes 3 and 5.
+
+Total Articulation Points = 2
+
+---
+
+## Intuition
+
+Bridges identify critical edges.
+
+Articulation Points identify critical vertices.
+
+Tarjan's Algorithm helps us find them efficiently using:
+
+- Discovery Time (dt)
+- Low Time (low)
+
+for every node during DFS traversal.
+
+---
+
+## Discovery Time
+
+```cpp
+dt[node]
+```
+
+Stores the time when a node is visited for the first time.
+
+Example:
+
+```text
+Node: 0 1 2 3
+dt  : 1 2 3 4
+```
+
+---
+
+## Low Time
+
+```cpp
+low[node]
+```
+
+Represents the earliest discovered node reachable from the current node using:
+
+- Tree edges
+- Back edges
+
+---
+
+## Conditions for Articulation Point
+
+### Case 1: Root Node
+
+If root has more than one DFS child:
+
+```cpp
+children > 1
+```
+
+then root is an articulation point.
+
+Reason:
+
+Removing root separates DFS subtrees.
+
+---
+
+### Case 2: Non-Root Node
+
+For an edge:
+
+```text
+u ---- v
+```
+
+after DFS traversal:
+
+```cpp
+if(low[v] >= dt[u])
+```
+
+then:
+
+```cpp
+u
+```
+
+is an articulation point.
+
+Reason:
+
+The subtree rooted at `v` cannot reach any ancestor of `u`.
+
+Removing `u` disconnects that subtree.
+
+---
+
+## Algorithm
+
+1. Build adjacency list.
+2. Initialize:
+   - Discovery Time Array
+   - Low Time Array
+3. Run DFS.
+4. Update low values.
+5. Check articulation point conditions.
+6. Store articulation points in a set.
+7. Return total count.
+
+---
+
+## Dry Run
+
+Input Graph:
+
+```text
+0 - 1 - 2
+    |
+    4
+   / \
+  3   5
+```
+
+DFS Traversal:
+
+```text
+0 → 1 → 2
+      ↓
+      4 → 3
+      ↓
+      5
+```
+
+Articulation Points:
+
+```text
+1 4
+```
+
+Count:
+
+```text
+2
+```
+
+---
+
+## Time Complexity
+
+```text
+O(V + E)
+```
+
+Where:
+
+- V = Number of Vertices
+- E = Number of Edges
+
+Each node and edge is processed only once.
+
+---
+
+## Space Complexity
+
+```text
+O(V + E)
+```
+
+Used for:
+
+- Adjacency List
+- Discovery Array
+- Low Array
+- Recursion Stack
+- Set of Critical Points
+
+---
+
+## Key Learning
+
+- Articulation Points are critical vertices in a graph.
+- Tarjan's Algorithm can find them in linear time.
+- Low Time and Discovery Time are fundamental DFS concepts.
+- Frequently asked in interviews and competitive programming.
+
+---
+
+## Solution Code
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+class Graph
+{
+public:
+    vector<vector<int>> adj;
+    int V;
+
+    Graph(int V)
+    {
+        this->V = V;
+        adj.resize(V);
+    }
+
+    int time;
+    vector<int> dt, low;
+
+    void addEdge(int u, int v)
+    {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    void dfs(int u, int parU, set<int> &CP)
+    {
+        dt[u] = low[u] = ++time;
+        int children = 0;
+
+        for (int v : adj[u])
+        {
+            if (dt[v] == -1)
+            {
+                children++;
+
+                dfs(v, u, CP);
+
+                low[u] = min(low[u], low[v]);
+
+                if (parU != -1 && low[v] >= dt[u])
+                {
+                    CP.insert(u);
+                }
+            }
+            else if (v != parU)
+            {
+                low[u] = min(low[u], dt[v]);
+            }
+        }
+
+        if (parU == -1 && children > 1)
+        {
+            CP.insert(u);
+        }
+    }
+
+    int articulationPoint()
+    {
+        time = 0;
+
+        dt.resize(V, -1);
+        low.resize(V);
+
+        set<int> criticalPoints;
+
+        for (int i = 0; i < V; i++)
+        {
+            if (dt[i] == -1)
+            {
+                dfs(i, -1, criticalPoints);
+            }
+        }
+
+        for (auto node : criticalPoints)
+        {
+            cout << node << " ";
+        }
+
+        cout << endl;
+
+        return criticalPoints.size();
+    }
+};
+
+int main()
+{
+    Graph g(6);
+
+    g.addEdge(1, 0);
+    g.addEdge(1, 2);
+    g.addEdge(4, 3);
+    g.addEdge(4, 5);
+    g.addEdge(4, 1);
+
+    cout << g.articulationPoint() << endl;
+
+    return 0;
+}
+```
