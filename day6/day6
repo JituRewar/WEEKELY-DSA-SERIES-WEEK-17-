@@ -1,0 +1,349 @@
+# Day 6 - Floyd Warshall Algorithm
+
+## Topic
+
+- Graphs
+- Dynamic Programming
+- All-Pairs Shortest Path
+- Floyd Warshall Algorithm
+- Negative Cycle Detection
+
+---
+
+## Problem Statement
+
+Given a weighted graph, find the shortest distance between every pair of vertices.
+
+Unlike Dijkstra and Bellman-Ford, which compute shortest paths from a single source, Floyd Warshall computes shortest paths between all pairs of vertices.
+
+---
+
+## Why Floyd Warshall?
+
+Suppose we need:
+
+```text
+Shortest Distance:
+0 → 1
+0 → 2
+0 → 3
+1 → 2
+1 → 3
+2 → 3
+...
+```
+
+Running Dijkstra from every node would work, but Floyd Warshall provides a clean Dynamic Programming solution for finding all-pairs shortest paths.
+
+---
+
+## Key Idea
+
+For every pair of vertices `(i, j)`:
+
+We check whether using another vertex `k` as an intermediate node produces a shorter path.
+
+Current path:
+
+```text
+i ------> j
+```
+
+Possible improved path:
+
+```text
+i ---> k ---> j
+```
+
+If:
+
+```cpp
+dist[i][k] + dist[k][j] < dist[i][j]
+```
+
+then update:
+
+```cpp
+dist[i][j]
+```
+
+---
+
+## Dynamic Programming Relation
+
+The core recurrence is:
+
+:contentReference[oaicite:0]{index=0}
+
+This checks whether passing through vertex `k` gives a shorter route from `i` to `j`.
+
+---
+
+## Algorithm
+
+### Step 1
+
+Initialize distance matrix:
+
+```cpp
+dist[i][j]
+```
+
+with:
+
+- Edge weight if edge exists
+- Infinity otherwise
+- 0 for diagonal entries
+
+---
+
+### Step 2
+
+Try every vertex as an intermediate node:
+
+```cpp
+for(k)
+```
+
+---
+
+### Step 3
+
+Update shortest paths:
+
+```cpp
+dist[i][j]
+```
+
+using:
+
+```cpp
+dist[i][k] + dist[k][j]
+```
+
+---
+
+### Step 4
+
+After all iterations:
+
+```cpp
+dist[i][j]
+```
+
+contains the shortest distance between every pair of vertices.
+
+---
+
+## Example
+
+Graph:
+
+```text
+0 --4--> 1
+|        |
+11       8
+|        |
+v        v
+2 --3--> 3
+^
+|
+2
+|
+1
+```
+
+Edges:
+
+```cpp
+0 → 1 = 4
+0 → 2 = 11
+1 → 2 = 2
+1 → 3 = 8
+2 → 3 = 3
+```
+
+---
+
+## Shortest Path Example
+
+Direct path:
+
+```text
+0 → 2 = 11
+```
+
+Using node 1:
+
+```text
+0 → 1 → 2
+= 4 + 2
+= 6
+```
+
+Updated shortest distance:
+
+```text
+dist[0][2] = 6
+```
+
+---
+
+## Time Complexity
+
+The algorithm contains three nested loops:
+
+```text
+V × V × V
+```
+
+Therefore:
+
+```text
+O(V³)
+```
+
+---
+
+## Space Complexity
+
+Distance matrix:
+
+```text
+V × V
+```
+
+Therefore:
+
+```text
+O(V²)
+```
+
+---
+
+## Negative Cycle Detection
+
+A unique advantage of Floyd Warshall is detecting negative cycles.
+
+After the algorithm:
+
+```cpp
+if(dist[i][i] < 0)
+```
+
+then a negative-weight cycle exists.
+
+Reason:
+
+A node should never have a negative distance to itself unless a negative cycle is present.
+
+---
+
+## Floyd Warshall vs Dijkstra vs Bellman Ford
+
+| Algorithm | Source | Negative Edges | All Pairs |
+|------------|---------|---------------|-----------|
+| Dijkstra | Single Source | ❌ No | ❌ |
+| Bellman Ford | Single Source | ✅ Yes | ❌ |
+| Floyd Warshall | All Sources | ✅ Yes | ✅ |
+
+---
+
+## Key Learning
+
+- Floyd Warshall solves the All-Pairs Shortest Path problem.
+- Uses Dynamic Programming instead of Greedy techniques.
+- Works with both positive and negative edge weights.
+- Can detect negative cycles.
+- One of the most important graph algorithms for interview preparation.
+
+---
+
+## Solution Code
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+class Graph
+{
+public:
+    int V;
+    vector<vector<pair<int, int>>> adj;
+
+    Graph(int V)
+    {
+        this->V = V;
+        adj.resize(V);
+    }
+
+    void addEdge(int u, int v, int wt)
+    {
+        adj[u].push_back({v, wt});
+    }
+
+    void floyedWarshal()
+    {
+        const int INF = 1e9;
+
+        vector<vector<int>> dist(V, vector<int>(V, INF));
+
+        for (int i = 0; i < V; i++)
+        {
+            dist[i][i] = 0;
+        }
+
+        for (int u = 0; u < V; u++)
+        {
+            for (auto edge : adj[u])
+            {
+                int v = edge.first;
+                int wt = edge.second;
+
+                dist[u][v] = wt;
+            }
+        }
+
+        for (int k = 0; k < V; k++)
+        {
+            for (int i = 0; i < V; i++)
+            {
+                for (int j = 0; j < V; j++)
+                {
+                    dist[i][j] = min(
+                        dist[i][j],
+                        dist[i][k] + dist[k][j]
+                    );
+                }
+            }
+        }
+    }
+};
+
+int main()
+{
+    Graph graph(4);
+
+    graph.addEdge(0, 1, 4);
+    graph.addEdge(0, 2, 11);
+    graph.addEdge(1, 2, 2);
+    graph.addEdge(1, 3, 8);
+    graph.addEdge(2, 3, 3);
+
+    graph.floyedWarshal();
+
+    return 0;
+}
+```
+
+---
+
+## Tags
+
+`Graphs`
+`Dynamic Programming`
+`Floyd Warshall`
+`All Pairs Shortest Path`
+`Shortest Path`
+`Negative Cycle Detection`
+`Competitive Programming`
