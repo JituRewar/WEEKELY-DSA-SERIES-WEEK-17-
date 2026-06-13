@@ -1,0 +1,309 @@
+# Week 17 - Day 8: Hash Maps
+
+## Topics Covered
+
+- Hashing
+- Hash Functions
+- Collision
+- Map
+- Unordered Map
+- Insertion
+- Traversal
+- Searching
+- Deletion
+- Important Functions
+
+---
+
+## What is Hashing?
+
+Hashing is a technique used to store and retrieve data in O(1) average time complexity.
+
+A hash function converts a key into an index where the value is stored.
+
+Example:
+
+Key = "Jitu"
+
+Hash Function
+
+↓
+
+Index = 7
+
+↓
+
+Store at bucket 7
+
+---
+
+## Map vs Unordered Map
+
+| Feature | map | unordered_map |
+|----------|------|------|
+| Internal DS | Red Black Tree | Hash Table |
+| Order | Sorted | Random |
+| Insert | O(log n) | O(1) avg |
+| Search | O(log n) | O(1) avg |
+| Delete | O(log n) | O(1) avg |
+
+---
+
+## Common Functions
+
+### Insert
+
+```cpp
+m["Jitu"] = 1;
+
+m.insert({"Kota",2});
+```
+
+### Search
+
+```cpp
+m.find("Jitu");
+```
+
+### Delete
+
+```cpp
+m.erase("Jitu");
+```
+
+### Check Existence
+
+```cpp
+if(m.count("Jitu"))
+```
+
+### Size
+
+```cpp
+m.size();
+```
+
+### Empty
+
+```cpp
+m.empty();
+```
+
+---
+
+## Time Complexities
+
+| Operation | map | unordered_map |
+|------------|------------|------------|
+| Insert | O(log n) | O(1) |
+| Search | O(log n) | O(1) |
+| Delete | O(log n) | O(1) |
+
+---
+
+## Applications
+
+- Frequency Counting
+- Duplicate Detection
+- Caching
+- Database Indexing
+- Graph Representation
+- Competitive Programming
+
+---
+
+## Interview Questions
+
+1. Difference between map and unordered_map?
+2. What is hashing?
+3. What is collision?
+4. Why unordered_map can become O(n)?
+5. What is load factor?
+Updated HashMap.cpp
+
+I've corrected some mistakes and added important functions.
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    cout << "===== UNORDERED MAP =====\n";
+
+    unordered_map<string, int> um;
+
+    // insertion methods
+
+    um.insert(make_pair("jitu", 1));
+
+    um.insert({"jaat", 2});
+
+    um["merta"] = 3;
+
+    um["merta"] = 85; // update value
+
+    // access
+
+    cout << "Value of merta : "
+         << um["merta"] << endl;
+
+    // size
+
+    cout << "Size : "
+         << um.size() << endl;
+
+    // count
+
+    cout << "Count of jitu : "
+         << um.count("jitu") << endl;
+
+    // find
+
+    if (um.find("jaat") != um.end())
+    {
+        cout << "jaat found\n";
+    }
+
+    // traversal using iterator
+
+    cout << "\nIterator Traversal:\n";
+
+    unordered_map<string, int>::iterator it;
+
+    for (it = um.begin(); it != um.end(); it++)
+    {
+        cout << it->first
+             << " "
+             << it->second
+             << endl;
+    }
+
+    // range based loop
+
+    cout << "\nRange Based Loop:\n";
+
+    for (auto x : um)
+    {
+        cout << x.first
+             << " "
+             << x.second
+             << endl;
+    }
+
+    // erase
+
+    um.erase("jaat");
+
+    cout << "\nAfter erase:\n";
+
+    for (auto x : um)
+    {
+        cout << x.first
+             << " "
+             << x.second
+             << endl;
+    }
+
+    cout << "\n\n===== ORDERED MAP =====\n";
+
+    map<string, int> mp;
+
+    mp["jitu"] = 1;
+    mp["jaat"] = 2;
+    mp["merta"] = 85;
+    mp["kota"] = 100;
+
+    // automatically sorted by key
+
+    for (auto x : mp)
+    {
+        cout << x.first
+             << " "
+             << x.second
+             << endl;
+    }
+
+    cout << "\nSize : "
+         << mp.size()
+         << endl;
+
+    cout << "Count of kota : "
+         << mp.count("kota")
+         << endl;
+
+    mp.erase("jaat");
+
+    cout << "\nAfter erase:\n";
+
+    for (auto x : mp)
+    {
+        cout << x.first
+             << " "
+             << x.second
+             << endl;
+    }
+
+    return 0;
+}
+Important Functions You Should Know
+Insert
+m.insert({"jitu",1});
+
+m["jitu"] = 1;
+Access
+cout << m["jitu"];
+Search
+m.find("jitu");
+Check Key Exists
+m.count("jitu");
+Delete
+m.erase("jitu");
+Size
+m.size();
+Empty
+m.empty();
+Clear Entire Map
+m.clear();
+First Element (Map Only)
+cout << m.begin()->first;
+Last Element (Map Only)
+auto it = prev(m.end());
+
+cout << it->first;
+Most Important DSA Applications
+Frequency Count
+vector<int> arr = {1,2,1,3,2,1};
+
+unordered_map<int,int> freq;
+
+for(auto x : arr)
+{
+    freq[x]++;
+}
+
+Output:
+
+1 -> 3
+2 -> 2
+3 -> 1
+Find First Non-Repeating Character
+string s = "aabcbd";
+
+unordered_map<char,int> freq;
+
+for(char ch : s)
+{
+    freq[ch]++;
+}
+Detect Duplicates
+unordered_map<int,int> mp;
+
+for(int x : arr)
+{
+    if(mp.count(x))
+    {
+        cout<<"Duplicate Found";
+    }
+
+    mp[x]++;
+}
